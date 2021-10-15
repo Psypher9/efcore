@@ -2825,14 +2825,15 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             var navigationProperty = navigationToTarget?.MemberInfo;
             var inverseProperty = inverseNavigation?.MemberInfo;
             if (setTargetAsPrincipal == false
-                || (inverseNavigation == null
+                || (setTargetAsPrincipal == null
+                    && inverseNavigation == null
                     && navigationProperty?.GetMemberType().IsAssignableFrom(
                         targetEntityType.ClrType)
                     == false))
             {
-                // Target is expected to be dependent or only one nav specified and it can't be the nav to principal
+                // Target is dependent or only one nav specified and it can't be the nav to principal
                 return targetEntityType.Builder.HasRelationship(
-                    Metadata, null, navigationToTarget, !setTargetAsPrincipal, configurationSource, required);
+                    Metadata, inverseNavigation, navigationToTarget, setTargetAsPrincipal: true, configurationSource, required);
             }
 
             if (setTargetAsPrincipal == null
