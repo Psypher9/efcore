@@ -61,13 +61,13 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         [ConditionalFact]
-        public void GetNamespaceFromOutputPath_throws_if_outputPath_is_null()
+        public void GetNamespaceFromOutputPath_throws_if_outputDir_is_null()
         {
             var namespacer = new FilePathNamespacer();
 
             var ex = Assert.Throws<ArgumentNullException>(() => namespacer.GetNamespaceFromOutputPath("", "", null));
 
-            Assert.Equal("outputPath", ex.ParamName);
+            Assert.Equal("outputDir", ex.ParamName);
         }
 
         [ConditionalFact]
