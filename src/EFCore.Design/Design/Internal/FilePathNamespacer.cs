@@ -9,12 +9,29 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
 {
     internal class FilePathNamespacer : IFilePathNamespacer
     {
-        public string GetNamespaceFromOutputPath(string knownProjectDir, string knownRootNamespace, string outputPath)
+        /// <summary>
+        /// <para>
+        /// if outputPath is a subfolder of knownProjectDir, then use each
+        /// subfolder as a subnamespace
+        /// --output-dir $(knownProjectDir)/A/B/C
+        /// => "namespace $(knownRootNamespace).A.B.C"
+        /// </para>
+        ///
+        /// <para>
+        /// If the outputPath contains spaces, those spaces (" ") are replaced
+        /// with underscores ("_").
+        /// </para>
+        /// </summary>
+        /// <param name="knownProjectDir">The target project's root directory</param>
+        /// <param name="knownRootNamespace">The root namespace of the target project</param>
+        /// <param name="outputDir">The path which may be part of the generated namespace</param>
+        /// <returns>The generated namespace</returns>
+        public string GetNamespaceFromOutputPath(string knownProjectDir, string knownRootNamespace, string outputDir)
         {
             Check.NotNull(knownProjectDir, nameof(knownProjectDir));
-            Check.NotNull(outputPath, nameof(outputPath));
+            Check.NotNull(outputDir, nameof(outputDir));
 
-            var subNamespace = SubnamespaceFromOutputPath(knownProjectDir, outputPath);
+            var subNamespace = SubnamespaceFromOutputPath(knownProjectDir, outputDir);
 
             return string.IsNullOrEmpty(subNamespace)
                 ? knownRootNamespace
