@@ -2,10 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Design.Internal;
 using Xunit;
 
@@ -24,6 +20,34 @@ namespace Microsoft.EntityFrameworkCore
 
             Assert.DoesNotContain(mySpaceyDir, result);
             Assert.Contains("My_Spacey_Directory", result);
+            Assert.Equal("MyNamespace.My_Spacey_Directory", result);
+        }
+
+
+        [ConditionalFact]
+        public void GetNamespaceFromOutputPath_appends_outputPath_to_knownRootNamespace()
+        {
+            var rootDirectory = "rootDirectory";
+            var rootNamespace = "MyNamespace";
+            var outputDir = "anotherChildDirectory";
+            var namespacer = new FilePathNamespacer();
+
+            var result = namespacer.GetNamespaceFromOutputPath(rootDirectory, rootNamespace, $"{rootDirectory}/{outputDir}");
+
+            Assert.Equal($"{rootNamespace}.{outputDir}", result);
+        }
+
+        [ConditionalFact]
+        public void GetNamespaceFromOutputPath_returns_only_outputPath_when_knownRootNamespace_is_empty()
+        {
+            var rootDirectory = "rootDirectory";
+            var rootNamespace = "";
+            var outputDir = "ChildDirectory";
+            var namespacer = new FilePathNamespacer();
+
+            var result = namespacer.GetNamespaceFromOutputPath(rootDirectory, rootNamespace, $"{rootDirectory}/{outputDir}");
+
+            Assert.Equal(outputDir, result);
         }
 
         [ConditionalFact]
@@ -47,32 +71,39 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         [ConditionalFact]
-        public void GetNamespaceFromOutputPath_can_run_with_null_knownRootNamespace()
-        {
-            Assert.True(false);
-        }
-
-        [ConditionalFact]
-        public void GetNamespaceFromOutputPath_returns_null_when_namespace_and_outputDir_are_null()
-        {
-            var rootDirectory = "rootDirectory";            
-            var namespacer = new FilePathNamespacer();
-
-            var result = namespacer.GetNamespaceFromOutputPath(rootDirectory, null, null);
-
-            Assert.Null(result);
-        }
-
-        [ConditionalFact]
         public void GetNamespaceFromOutputPath_returns_rootNamespace_when_outputDir_not_in_knownProjectDir_path()
         {
             var rootDirectory = "rootDirectory";
-            var mySpaceyDir = "anotherDirectory/anotherChildDirectory";
+            var childDirectory = "anotherDirectory/anotherChildDirectory";
             var namespacer = new FilePathNamespacer();
 
-            var result = namespacer.GetNamespaceFromOutputPath(rootDirectory, "MyNamespace", mySpaceyDir);
+            var result = namespacer.GetNamespaceFromOutputPath(rootDirectory, "MyNamespace", childDirectory);
 
             Assert.Equal("MyNamespace", result);
         }
+
+        [ConditionalFact]
+        public void GetNamespaceFromOutputPath_returns_knownRootNamespace_when_knownProjectDir_and_outPutDir_are_empty()
+        {
+            var knownNamespace = "MyNamespace";            
+            var namespacer = new FilePathNamespacer();
+
+            var result = namespacer.GetNamespaceFromOutputPath("", knownNamespace, "");
+
+            Assert.Equal(knownNamespace, result);
+        }
+
+        [ConditionalFact]
+        public void GetNamespaceFromOutputPath_returns_empty_when_all_arguments_empty()
+        {
+            var namespacer = new FilePathNamespacer();
+
+            var result = namespacer.GetNamespaceFromOutputPath("", "", "");
+
+            Assert.Empty(result);
+        }
+
+
+
     }
 }
