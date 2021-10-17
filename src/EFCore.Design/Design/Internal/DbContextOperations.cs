@@ -146,6 +146,7 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
 
             var services = _servicesBuilder.Build(context);
             var scaffolder = services.GetRequiredService<ICompiledModelScaffolder>();
+            var namespacer = services.GetRequiredService<IFilePathNamespacer>();
 
             if (outputDir == null)
             {
@@ -161,7 +162,7 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
 
             outputDir = Path.GetFullPath(Path.Combine(_projectDir, outputDir));
 
-            var finalModelNamespace = modelNamespace ?? GetNamespaceFromOutputPath(outputDir) ?? "";
+            var finalModelNamespace = modelNamespace ?? namespacer.GetNamespaceFromOutputPath(_projectDir, _rootNamespace ?? "", outputDir) ?? "";
 
             scaffolder.ScaffoldModel(
                 context.GetService<IDesignTimeModel>().Model,
@@ -187,36 +188,6 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
             {
                 _reporter.WriteWarning(DesignStrings.CompiledModelCustomCacheKeyFactory(cacheKeyFactory.GetType().ShortDisplayName()));
             }
-        }
-
-        private string? GetNamespaceFromOutputPath(string directoryPath)
-        {
-            var subNamespace = SubnamespaceFromOutputPath(_projectDir, directoryPath);
-            return string.IsNullOrEmpty(subNamespace)
-                ? _rootNamespace
-                : string.IsNullOrEmpty(_rootNamespace)
-                    ? subNamespace
-                    : _rootNamespace + "." + subNamespace;
-        }
-
-        // if outputDir is a subfolder of projectDir, then use each subfolder as a subnamespace
-        // --output-dir $(projectFolder)/A/B/C
-        // => "namespace $(rootnamespace).A.B.C"
-        private static string? SubnamespaceFromOutputPath(string projectDir, string outputDir)
-        {
-            if (!outputDir.StartsWith(projectDir, StringComparison.Ordinal))
-            {
-                return null;
-            }
-
-            var subPath = outputDir.Substring(projectDir.Length);
-
-            return !string.IsNullOrWhiteSpace(subPath)
-                ? string.Join(
-                    ".",
-                    subPath.Split(
-                        new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries))
-                : null;
         }
 
         /// <summary>
