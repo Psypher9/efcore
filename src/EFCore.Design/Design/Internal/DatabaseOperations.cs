@@ -96,11 +96,11 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
             using var scope = services.CreateScope();
 
             var scaffolder = scope.ServiceProvider.GetRequiredService<IReverseEngineerScaffolder>();
-            var namespacer = services.GetRequiredService<IFilePathNamespacer>();
+            var cSharpHelper = services.GetRequiredService<ICSharpHelper>();
 
-            var finalModelNamespace = modelNamespace ?? namespacer.GetNamespaceFromOutputPath(_projectDir, _rootNamespace ?? "", outputDir);
+            var finalModelNamespace = modelNamespace ?? cSharpHelper.Namespace(_rootNamespace ?? "", outputDir);
             var finalContextNamespace =
-                contextNamespace ?? modelNamespace ?? namespacer.GetNamespaceFromOutputPath(_projectDir, _rootNamespace ?? "", outputContextDir);
+                contextNamespace ?? modelNamespace ?? cSharpHelper.Namespace(_rootNamespace ?? "", outputContextDir);
 
             var scaffoldedModel = scaffolder.ScaffoldModel(
                 connectionString,

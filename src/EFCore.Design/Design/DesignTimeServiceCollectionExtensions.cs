@@ -74,7 +74,6 @@ namespace Microsoft.EntityFrameworkCore.Design
                         .TryAddSingleton<IScaffoldingTypeMapper, ScaffoldingTypeMapper>()
                         .TryAddSingleton<MigrationsCodeGeneratorDependencies, MigrationsCodeGeneratorDependencies>()
                         .TryAddSingleton<ModelCodeGeneratorDependencies, ModelCodeGeneratorDependencies>()
-                        .TryAddSingleton<IFilePathNamespacer, FilePathNamespacer>()
                         .TryAddScoped<IReverseEngineerScaffolder, ReverseEngineerScaffolder>()
                         .TryAddScoped<MigrationsScaffolderDependencies, MigrationsScaffolderDependencies>()
                         .TryAddScoped<IMigrationsScaffolder, MigrationsScaffolder>()

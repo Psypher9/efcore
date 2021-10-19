@@ -146,7 +146,7 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
 
             var services = _servicesBuilder.Build(context);
             var scaffolder = services.GetRequiredService<ICompiledModelScaffolder>();
-            var namespacer = services.GetRequiredService<IFilePathNamespacer>();
+            var cSharpHelper = services.GetRequiredService<ICSharpHelper>();
 
             if (outputDir == null)
             {
@@ -162,7 +162,7 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
 
             outputDir = Path.GetFullPath(Path.Combine(_projectDir, outputDir));
 
-            var finalModelNamespace = modelNamespace ?? namespacer.GetNamespaceFromOutputPath(_projectDir, _rootNamespace ?? "", outputDir) ?? "";
+            var finalModelNamespace = modelNamespace ?? cSharpHelper.Namespace(_rootNamespace ?? string.Empty, outputDir) ?? "";
 
             scaffolder.ScaffoldModel(
                 context.GetService<IDesignTimeModel>().Model,

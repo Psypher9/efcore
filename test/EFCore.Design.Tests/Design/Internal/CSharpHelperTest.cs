@@ -285,6 +285,9 @@ namespace Microsoft.EntityFrameworkCore.Design.Internal
         [InlineData(new[] { "" }, "_")]
         [InlineData(new string[] { }, "_")]
         [InlineData(new string[] { null }, "_")]
+        [InlineData(new[] {"My Spacey Namespace"}, "My_Spacey_Namespace")]
+        [InlineData(new[] {"RootNamespace", "My Spacey Namespace"}, "RootNamespace.My_Spacey_Namespace")]
+        [InlineData(new[] {"RootNamespace", "ParentPath/My Spacey Namespace"}, "RootNamespace.ParentPath.My_Spacey_Namespace")]
         public void Namespace_works(string[] input, string excepted)
         {
             Assert.Equal(excepted, new CSharpHelper(TypeMappingSource).Namespace(input));
